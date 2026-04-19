@@ -1,0 +1,4 @@
+.env
+library/
+__pycache__/
+*.epub
