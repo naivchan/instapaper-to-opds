@@ -10,14 +10,15 @@ services:
       - INSTAPAPER_EMAIL=you@email.com
       - INSTAPAPER_PASSWORD=yourpassword
 
-  # The OPDS Server (Built from the opds-src folder)
+# The OPDS Server (Using an existing pyopds-based image)
   instapaper-opds:
-    build: ./opds-src
+    image: ghcr.io/vladbalun/opds-server:latest 
     container_name: instapaper-opds
     ports:
       - "8086:8080"
     volumes:
-      - ./library:/books
+      - ./library:/opds-server/data:ro
+    # Note: Ensure the environment variable name matches the image's documentation
     environment:
-      - LIBRARY_DIR=/books
+      - SCAN_INTERVAL=30
     restart: unless-stopped
