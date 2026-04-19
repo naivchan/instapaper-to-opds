@@ -1,0 +1,23 @@
+services:
+  # The Downloader (Uses your existing Dockerfile)
+  instapaper-downloader:
+    build: .
+    volumes:
+      - ./library:/library
+    environment:
+      - INSTAPAPER_KEY=YOUR_INSTAPAPER_KEY
+      - INSTAPAPER_SECRET=YOUR_SECRET_INSTAPAPER_KEY
+      - INSTAPAPER_EMAIL=you@email.com
+      - INSTAPAPER_PASSWORD=yourpassword
+
+  # The OPDS Server (Built from the opds-src folder)
+  instapaper-opds:
+    build: ./opds-src
+    container_name: instapaper-opds
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./library:/books
+    environment:
+      - LIBRARY_DIR=/books
+    restart: unless-stopped
