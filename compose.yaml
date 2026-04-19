@@ -10,15 +10,15 @@ services:
       - INSTAPAPER_EMAIL=you@email.com
       - INSTAPAPER_PASSWORD=yourpassword
 
-# The OPDS Server (Using an existing pyopds-based image)
+# The OPDS Server (Using c4software's pyopds-server image)
   instapaper-opds:
-    image: ghcr.io/vladbalun/opds-server:latest 
+    image: c4software/pyopds-server:latest
     container_name: instapaper-opds
     ports:
       - "8086:8080"
     volumes:
-      - ./library:/opds-server/data:ro
-    # Note: Ensure the environment variable name matches the image's documentation
+      - ./library:/books:ro
     environment:
-      - SCAN_INTERVAL=30
+      # Tell the server where the EPUBs are inside the container
+      - LIBRARY_DIR=/books
     restart: unless-stopped
