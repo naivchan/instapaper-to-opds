@@ -1,16 +1,15 @@
 services:
-  # The Downloader (Uses your existing Dockerfile)
+  # The Downloader (Builds from your Dockerfile)
   instapaper-downloader:
     build: .
+    image: instapaper-downloader:latest
+    container_name: instapaper-downloader
     volumes:
       - ./library:/library
-    environment:
-      - INSTAPAPER_KEY=YOUR_INSTAPAPER_KEY
-      - INSTAPAPER_SECRET=YOUR_SECRET_INSTAPAPER_KEY
-      - INSTAPAPER_EMAIL=you@email.com
-      - INSTAPAPER_PASSWORD=yourpassword
+    env_file:
+      - .env # This pulls your KEY, SECRET, EMAIL, and PASS automatically
 
-# The OPDS Server (Using c4software's pyopds-server image)
+  # The OPDS Server (Using c4software's pyopds-server image)
   instapaper-opds:
     image: c4software/pyopds-server:latest
     container_name: instapaper-opds
@@ -19,6 +18,5 @@ services:
     volumes:
       - ./library:/books:ro
     environment:
-      # Tell the server where the EPUBs are inside the container
       - LIBRARY_DIR=/books
     restart: unless-stopped
