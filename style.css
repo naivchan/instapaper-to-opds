@@ -1,0 +1,32 @@
+h1, h2, h3 {
+    font-family: sans-serif;
+    color: #111;
+    margin-top: 1.5em;
+}
+
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1em auto;
+}
+
+
+/* Force block paragraph styling */
+p {
+    display: block !important;
+    margin-top: 1.2em !important;
+    margin-bottom: 1.2em !important;
+    text-indent: 0 !important;
+}
+
+/* Fix for some readers that wrap everything in divs */
+div {
+    margin-bottom: 1em !important;
+}
+
+body {
+    padding: 5%;
+    line-height: 1.6;
+}
