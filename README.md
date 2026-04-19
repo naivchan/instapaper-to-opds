@@ -1,1 +1,2 @@
-You need to apply for an [instapaper developer API key](https://www.instapaper.com/developers/applications) in order for this tool to work. After that, you can enter your instapaper login details and then `docker compose up`.
+You need to apply for an [instapaper developer API key](https://www.instapaper.com/developers/applications) in order for this tool to work. After that, you can enter your instapaper login details into the compose.yaml and then `docker compose up`.
+
