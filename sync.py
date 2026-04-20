@@ -55,22 +55,28 @@ def main():
             if not article_content:
                 continue
 
-            # 1. Spacing Fix: Only fix broken line breaks, don't wrap in <p>
-            # This converts double-breaks to paragraph markers without destroying <h1> or <div>
-            cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
+            # 1. Clean and Wrap Logic
+            # Convert all <br> variants to actual newlines for easier splitting
+            text_only = re.sub(r'<br\s*/?>', '\n', article_content)
             
-            # 2. Structure Fix: Wrap in a full HTML skeleton with a div
-            # Using a div allows block elements (h1, p, ul) to live inside it
+            # Split by newlines and filter out empty strings
+            lines = [line.strip() for line in text_only.split('\n') if line.strip()]
+            
+            # Wrap every single line in proper <p> tags
+            # This forces Pandoc and E-readers to respect the breaks
+            formatted_paragraphs = "".join([f"<p>{line}</p>" for line in lines])
+            
+            # 2. Construct valid HTML skeleton
             final_html = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{bm.title}</title>
 </head>
 <body>
     <div class="article-body">
-        {cleaned}
+        <h1>{bm.title}</h1>
+        {formatted_paragraphs}
     </div>
 </body>
 </html>
