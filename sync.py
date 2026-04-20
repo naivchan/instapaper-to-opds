@@ -26,12 +26,11 @@ def main():
         os.makedirs('/library')
 
     # --- TRACK UNREAD ARTICLES ---
-    # We create a set of filenames that SHOULD exist
     unread_filenames = set()
     for bm in bookmarks:
         unread_filenames.add(get_safe_filename(bm.title))
 
-    # --- CLEANUP PHASE (Delete Archived/Removed) ---
+    # --- CLEANUP PHASE ---
     print("Syncing local library with Instapaper...", flush=True)
     local_files = [f for f in os.listdir('/library') if f.endswith('.epub')]
 
@@ -40,7 +39,7 @@ def main():
             print(f"  [-] Removing archived/deleted: {local_file}", flush=True)
             os.remove(os.path.join('/library', local_file))
 
-    # --- DOWNLOAD PHASE (Existing Logic) ---
+    # --- DOWNLOAD PHASE ---
     for bm in bookmarks:
         filename = get_safe_filename(bm.title)
         epub_path = os.path.join('/library', filename)
@@ -56,16 +55,41 @@ def main():
             if not article_content:
                 continue
 
-            # Paragraph Fix Logic
-            cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
-            final_html = f"<html><body><p>{cleaned}</p></body></html>"
+            # 1. Clean and Wrap Logic
+            # Convert all <br> variants to actual newlines for easier splitting
+            text_only = re.sub(r'<br\s*/?>', '\n', article_content)
+            
+            # Split by newlines and filter out empty strings
+            lines = [line.strip() for line in text_only.split('\n') if line.strip()]
+            
+            # Wrap every single line in proper <p> tags
+            # This forces Pandoc and E-readers to respect the breaks
+            formatted_paragraphs = "".join([f"<p>{line}</p>" for line in lines])
+            
+            # 2. Construct valid HTML skeleton
+            final_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div class="article-body">
+        <h1>{bm.title}</h1>
+        {formatted_paragraphs}
+    </div>
+</body>
+</html>
+"""
 
             with open(temp_html, "w", encoding="utf-8") as f:
                 f.write(final_html)
 
+            # 3. Pandoc Conversion
             subprocess.run([
                 "pandoc", temp_html,
                 "-f", "html",
+                "-t", "epub",
                 "-o", epub_path,
                 "--css", "style.css",
                 "--variable", "indent=false",
@@ -79,7 +103,7 @@ def main():
                 os.remove(temp_html)
 
         except Exception as e:
-            print(f"  [✗] Error: {e}", flush=True)
+            print(f"  [✗] Error processing {bm.title}: {e}", flush=True)
 
 if __name__ == "__main__":
     main()
