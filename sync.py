@@ -55,25 +55,25 @@ def main():
             if not article_content:
                 continue
 
-            # 1. Spacing Fix: Convert double <br> to paragraphs for e-ink readability
+            # 1. Spacing Fix: Convert double <br> to paragraphs
             cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
             
-            # 2. Structure Fix: Wrap in div/body to preserve original HTML tags (h1, bold, etc.)
+            # 2. Structure Fix: Wrap in div/body to preserve HTML tags
             final_html = f"""
-            <html>
-            <head><meta charset="utf-8"></head>
-            <body>
-                <div class="article-body">
-                    {cleaned}
-                </div>
-            </body>
-            </html>
-            """
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+    <div class="article-body">
+        {cleaned}
+    </div>
+</body>
+</html>
+"""
 
             with open(temp_html, "w", encoding="utf-8") as f:
                 f.write(final_html)
 
-            # 3. Conversion: Using Pandoc to generate the EPUB
+            # 3. Conversion: Using Pandoc
             subprocess.run([
                 "pandoc", temp_html,
                 "-f", "html",
