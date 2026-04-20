@@ -30,7 +30,7 @@ def main():
     for bm in bookmarks:
         unread_filenames.add(get_safe_filename(bm.title))
 
-    # --- CLEANUP PHASE (Delete Archived/Removed) ---
+    # --- CLEANUP PHASE ---
     print("Syncing local library with Instapaper...", flush=True)
     local_files = [f for f in os.listdir('/library') if f.endswith('.epub')]
 
@@ -55,13 +55,19 @@ def main():
             if not article_content:
                 continue
 
-            # 1. Spacing Fix: Convert double <br> to paragraphs
+            # 1. Spacing Fix: Only fix broken line breaks, don't wrap in <p>
+            # This converts double-breaks to paragraph markers without destroying <h1> or <div>
             cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
             
-            # 2. Structure Fix: Wrap in div/body to preserve HTML tags
+            # 2. Structure Fix: Wrap in a full HTML skeleton with a div
+            # Using a div allows block elements (h1, p, ul) to live inside it
             final_html = f"""
+<!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>
+    <meta charset="utf-8">
+    <title>{bm.title}</title>
+</head>
 <body>
     <div class="article-body">
         {cleaned}
@@ -73,7 +79,7 @@ def main():
             with open(temp_html, "w", encoding="utf-8") as f:
                 f.write(final_html)
 
-            # 3. Conversion: Using Pandoc
+            # 3. Pandoc Conversion
             subprocess.run([
                 "pandoc", temp_html,
                 "-f", "html",
