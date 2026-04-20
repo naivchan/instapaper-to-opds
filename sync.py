@@ -26,7 +26,6 @@ def main():
         os.makedirs('/library')
 
     # --- TRACK UNREAD ARTICLES ---
-    # We create a set of filenames that SHOULD exist
     unread_filenames = set()
     for bm in bookmarks:
         unread_filenames.add(get_safe_filename(bm.title))
@@ -40,7 +39,7 @@ def main():
             print(f"  [-] Removing archived/deleted: {local_file}", flush=True)
             os.remove(os.path.join('/library', local_file))
 
-    # --- DOWNLOAD PHASE (Existing Logic) ---
+    # --- DOWNLOAD PHASE ---
     for bm in bookmarks:
         filename = get_safe_filename(bm.title)
         epub_path = os.path.join('/library', filename)
@@ -51,17 +50,15 @@ def main():
 
         print(f"Processing: {bm.title}...", flush=True)
 
-       try:
+        try:
             article_content = bm.text
             if not article_content:
                 continue
 
-            # 1. Spacing Fix: If the source uses double <br> instead of real paragraphs,
-            # we convert them. If the source already has <p> tags, this won't hurt.
+            # 1. Spacing Fix: Convert double <br> to paragraphs for e-ink readability
             cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
             
-            # 2. Structure Fix: Wrap in a div instead of a p tag. 
-            # This ensures Pandoc treats it as a full document body.
+            # 2. Structure Fix: Wrap in div/body to preserve original HTML tags (h1, bold, etc.)
             final_html = f"""
             <html>
             <head><meta charset="utf-8"></head>
@@ -76,10 +73,11 @@ def main():
             with open(temp_html, "w", encoding="utf-8") as f:
                 f.write(final_html)
 
+            # 3. Conversion: Using Pandoc to generate the EPUB
             subprocess.run([
                 "pandoc", temp_html,
                 "-f", "html",
-                "-t", "epub", # Explicitly set output format
+                "-t", "epub",
                 "-o", epub_path,
                 "--css", "style.css",
                 "--variable", "indent=false",
@@ -93,7 +91,7 @@ def main():
                 os.remove(temp_html)
 
         except Exception as e:
-            print(f"  [✗] Error: {e}", flush=True)
+            print(f"  [✗] Error processing {bm.title}: {e}", flush=True)
 
 if __name__ == "__main__":
     main()
