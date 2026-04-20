@@ -51,14 +51,27 @@ def main():
 
         print(f"Processing: {bm.title}...", flush=True)
 
-        try:
+       try:
             article_content = bm.text
             if not article_content:
                 continue
 
-            # Paragraph Fix Logic
+            # 1. Spacing Fix: If the source uses double <br> instead of real paragraphs,
+            # we convert them. If the source already has <p> tags, this won't hurt.
             cleaned = re.sub(r'(<br\s*/?>\s*){2,}', '</p><p>', article_content)
-            final_html = f"<html><body><p>{cleaned}</p></body></html>"
+            
+            # 2. Structure Fix: Wrap in a div instead of a p tag. 
+            # This ensures Pandoc treats it as a full document body.
+            final_html = f"""
+            <html>
+            <head><meta charset="utf-8"></head>
+            <body>
+                <div class="article-body">
+                    {cleaned}
+                </div>
+            </body>
+            </html>
+            """
 
             with open(temp_html, "w", encoding="utf-8") as f:
                 f.write(final_html)
@@ -66,6 +79,7 @@ def main():
             subprocess.run([
                 "pandoc", temp_html,
                 "-f", "html",
+                "-t", "epub", # Explicitly set output format
                 "-o", epub_path,
                 "--css", "style.css",
                 "--variable", "indent=false",
