@@ -1,6 +1,6 @@
 # Prerequisites
 
-- Docker engine
+- Docker Compose
 - Instapaper API key - You need to apply for one [here](https://www.instapaper.com/developers/applications)
 
 These instructions assume you're installing on an Ubuntu VPS. Modify as needed for other setups. 
