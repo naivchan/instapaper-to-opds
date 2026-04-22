@@ -1,7 +1,7 @@
 # Prerequisites
 
 - Docker engine
-- Instapaper API key - You need to apply for an [here](https://www.instapaper.com/developers/applications)
+- Instapaper API key - You need to apply for one [here](https://www.instapaper.com/developers/applications)
 
 # Install
 
