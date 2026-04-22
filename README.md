@@ -3,6 +3,8 @@
 - Docker engine
 - Instapaper API key - You need to apply for one [here](https://www.instapaper.com/developers/applications)
 
+These instructions assume you're installing on an Ubuntu VPS. Modify as needed for other setups. 
+
 # Install
 
 ### 1. Clone and enter the repo
@@ -16,6 +18,7 @@ cd instapaper-to-opds
 cp .env.example .env
 nano .env
 ```
+You can also edit the existing example and save as `.env`
 
 ### 3. Start the web server container
 ```
@@ -43,4 +46,4 @@ Add the following line to the bottom of the file with your directory path. This 
 
 ### 6. Access
 Your OPDS catalog is now live at:
-http://<your-vps-ip>:<port>
+`http://<your-vps-ip>:8086`
