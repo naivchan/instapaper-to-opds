@@ -5,6 +5,8 @@
 
 These instructions assume you're installing on an Ubuntu VPS. Modify as needed for other setups. 
 
+This project was coded with AI.
+
 # Install
 
 ### 1. Clone and enter the repo
